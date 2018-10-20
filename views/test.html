@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <input type="file" id="file">
+    <input type="text" id="name" placeholder="昵称">
+    <input type="text" id="status" placeholder="状态">
+    <input type="text" id="index" placeholder="排序">
+    <input type="text" id="type" placeholder="资源类型">
+    <input type="text" id="position" placeholder="输出位置">
+    <div id="sh">shangchuan</div>
+    <div id="test">test</div>
+    <script type="text/javascript" src="/assets/js/jquery.js"></script>
+    <script>
+        $('#test').on('click', function () {
+            $.ajax({
+                url: "/source/editFile",
+                type: 'POST',
+                async: false,
+                data: {
+                    id: 1,
+                    name: 777,
+                    url: 777,
+                    index: 777,
+                    type: 777,
+                },
+                success: function (responseStr) {
+                    alert(responseStr.info)
+                }
+            });
+        })
+        $("#sh").on('click', function () {
+            var formData = new FormData();
+            formData.append("file", $("#file")[0].files[0]);
+            formData.append("name", $("#name").val())
+            formData.append("status", $("#status").val())
+            formData.append("index", $("#index").val())
+            formData.append("type", $("#type").val())
+            formData.append("position", $("#position").val())
+            $.ajax({
+                url: "/source/fileUpload",
+                type: 'POST',
+                async: false,
+                data: formData,
+                // 告诉jQuery不要去处理发送的数据
+                processData: false,
+                // 告诉jQuery不要去设置Content-Type请求头
+                contentType: false,
+                beforeSend: function () {
+                    console.log("正在进行，请稍候");
+                },
+                success: function (responseStr) {
+                    if (responseStr == "01") {
+                        alert("导入成功");
+                    } else {
+                        alert("导入失败");
+                    }
+                }
+            });
+
+        })
+    </script>
+</body>
+
+</html>
