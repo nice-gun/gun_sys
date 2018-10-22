@@ -15,12 +15,13 @@ module.exports = {
             }
         });
     },
+    // 查询资源
     searchSource: function (parameter, callback) {
         pool.getConnection(function (err, conn) {
             if (err) {
                 callback(err, null, null);
             } else {
-                conn.query(`select * from sys_source where id = ${pool.escape(parameter.id)} or name = ${pool.escape(parameter.name)} or status = ${pool.escape(parameter.status)} or type = ${pool.escape(parameter.type)} or position = ${pool.escape(parameter.position)}`, function (qerr, vals, fields) {
+                conn.query(`select * from sys_source where id = ${pool.escape(parameter.id)} or name = ${pool.escape(parameter.name)} or status = ${pool.escape(parameter.status)} or type = ${pool.escape(parameter.type)} or position = ${pool.escape(parameter.position)} order by \`index\` asc `, function (qerr, vals, fields) {
                     //释放连接
                     conn.release();
                     //事件驱动回调
@@ -29,6 +30,7 @@ module.exports = {
             }
         });
     },
+    // 删除资源
     deleteSource: function (parameter, callback) {
         pool.getConnection(function (err, conn) {
             if (err) {
@@ -44,6 +46,7 @@ module.exports = {
             }
         });
     },
+    // 编辑资源
     editSource: function (parameter, callback) {
         pool.getConnection(function (err, conn) {
             if (err) {

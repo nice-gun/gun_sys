@@ -46,7 +46,7 @@ hd.post('/searchFile', function (req, res, next) {
 // 删除资源
 hd.post('/deleteFile', function (req, res, next) {
   dao.searchSource({
-    ...req.body
+    id: req.body.id
   }, function (err, vals) {
     if (err) return res.json({ info: '未查询到该数据', status: "1" });
     fs.unlink(`${path.join(__dirname, '../../')}${vals[0].url}`, function (err) {

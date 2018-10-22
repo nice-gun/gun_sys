@@ -13,7 +13,8 @@ var FileStore = require('session-file-store')(session);
 var redis = require('redis');
 var redisClient = redis.createClient('6379', '127.0.0.1');
 var RedisStrore = require('connect-redis')(session);
-var _ = require("./config/application")
+var _ = require("./config/application");
+var log4js = require('log4js');
 
 /**
  * @function path.join - 注入原型html模板
@@ -30,6 +31,23 @@ app.set('view engine', 'html');
 sequelize.authenticate().then(() => {
 }).catch(err => {
 });
+
+// write Log
+log4js.configure({
+  appenders: {
+    logfile: { type: 'dateFile', filename: 'logs/yapin.log' },
+    display: { type: 'console' }
+  },
+  categories: { default: { appenders: ['logfile', 'display'], level: 'debug' } }
+});
+var LogFile = log4js.getLogger('/');
+// global log
+
+Object.defineProperty(global, "log", {
+  get: function () {
+    return LogFile
+  }
+})
 
 // 跨域
 var allowCrossDomain = function (req, res, next) {
@@ -56,7 +74,6 @@ app.use('/assets', express.static('public'))
 
 app.use(session({
   ..._.config.session,
-  
   store: new RedisStrore({ client: redisClient }),
 }));
 
@@ -65,6 +82,26 @@ app.use(session({
  */
 
 fs.readdir(`${__dirname}\\handler`, function (err, file) {
+  let timeLock = 0;
+  // Malicious access log
+  app.use(function (req, res, next) {
+    if(req.session.lastTime){
+      if ((new Date()).getTime() - req.session.lastTime > 1000) {
+        timeLock = 0
+      } else {
+        if (req.session.times < 7) {
+          timeLock++
+        } else {
+          return res.json({ info: '请勿重复访问', status: '1' });
+        }
+      }
+    }
+    req.session.lastTime = (new Date()).getTime()
+    req.session.times = timeLock
+    LogFile.info(`来源：${req.host} - 访问目标：${req.originalUrl} - 参数：${JSON.stringify(req.body)} - 方法：${req.method} - ip：${req.ip} - 请求头：${JSON.stringify(req.headers)} - 瞬间访问次数：${req.session.times} - 访问时间：${req.session.lastTime} - session：${JSON.stringify(req.session)}`);
+    next();
+  })
+  // set handler
   file.forEach(element => {
     // handler
     app.use(require(`${__dirname}\\handler\\${element}`).default, require(`${__dirname}\\handler\\${element}`).hd);

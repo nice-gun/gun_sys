@@ -15,21 +15,28 @@
     <input type="text" id="index" placeholder="排序">
     <input type="text" id="type" placeholder="资源类型">
     <input type="text" id="position" placeholder="输出位置">
+    <input type="text" id="permCode" placeholder="permCode">
+    <input type="text" id="name" placeholder="name">
+    <input type="text" id="status" placeholder="status">
+    <input type="text" id="type" placeholder="type">
+    <input type="text" id="url" placeholder="url">
+    <input type="text" id="description" placeholder="description">
     <div id="sh">shangchuan</div>
     <div id="test">test</div>
     <script type="text/javascript" src="/assets/js/jquery.js"></script>
     <script>
         $('#test').on('click', function () {
             $.ajax({
-                url: "/source/editFile",
+                url: "/permission/setPermission",
                 type: 'POST',
                 async: false,
                 data: {
-                    id: 1,
-                    name: 777,
-                    url: 777,
-                    index: 777,
-                    type: 777,
+                    permCode: $("#permCode").val(),
+                    name: $("#name").val(),
+                    status: $("#status").val(),
+                    type: $("#type").val(),
+                    url: $("#url").val(),
+                    description: $("#description").val(),
                 },
                 success: function (responseStr) {
                     alert(responseStr.info)
