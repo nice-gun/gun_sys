@@ -21,7 +21,8 @@ hd.get('/captcha', function (req, res, next) {
 
 // 登录
 hd.post('/singIn', function (req, res, next) {
-  console.log(req)
+  console.log(req.body.captcha, req.session.captcha)
+  if (req.body.captcha != req.session.captcha) return res.json({ info: '验证码错误', status: "1" });
   // 查询用户存在获取盐值
   dao.searchUser({
     ...req.body
@@ -34,7 +35,7 @@ hd.post('/singIn', function (req, res, next) {
       if (crypto.createHash('md5').update(req.body.password + vals[0].salt).digest('hex') == vals[0].password) {
         req.session.user = vals[0];
         res.json({ info: '登陆成功', status: "0" });
-      }else{
+      } else {
         res.json({ info: '密码错误', status: "1" });
       }
     }
@@ -51,6 +52,7 @@ hd.post('/register', function (req, res, next) {
       dao.addUser({
         ...req.body,
         status: 0,
+        type:1,
         // 增加盐值
         salt: new Date().getTime() + req.body.account,
         // 掩盖密码

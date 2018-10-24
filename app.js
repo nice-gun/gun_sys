@@ -10,8 +10,6 @@ var app = express();
 var assert = require("assert");
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
-var redis = require('redis');
-var redisClient = redis.createClient('6379', '127.0.0.1');
 var RedisStrore = require('connect-redis')(session);
 var _ = require("./config/application");
 var log4js = require('log4js');
@@ -59,7 +57,7 @@ var allowCrossDomain = function (req, res, next) {
   next();
 };
 
-_.config.Access ? app.use(allowCrossDomain) : ''
+_.Access ? app.use(allowCrossDomain) : ''
 
 // public静态资源托管
 app.use(logger('dev'));
@@ -71,10 +69,15 @@ app.use('/assets', express.static('public'))
 /**
  * @function session - 注入session
  */
-
+// redisClient.hmset("test", { username: '‘kris‘', password: '‘password‘' },function(err){
+//   console.log(err)
+// })
+// redisClient.hgetall("test",function(err, object) {
+//   console.log(object)
+// })
 app.use(session({
-  ..._.config.session,
-  store: new RedisStrore({ client: redisClient }),
+  ..._.session,
+  store: new RedisStrore({ client: _.redis }),
 }));
 
 /**
@@ -85,7 +88,8 @@ fs.readdir(`${__dirname}\\handler`, function (err, file) {
   let timeLock = 0;
   // Malicious access log
   app.use(function (req, res, next) {
-    if(req.session.lastTime){
+    console.log(req.session)
+    if (req.session.lastTime) {
       if ((new Date()).getTime() - req.session.lastTime > 1000) {
         timeLock = 0
       } else {

@@ -1,4 +1,4 @@
-var pool = require('../../orm/mysql');
+var pool = require('../../orm/mysql').pool;
 module.exports = {
     // 写入数据
     writeSource: function (parameter, callback) {

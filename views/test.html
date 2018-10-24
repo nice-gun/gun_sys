@@ -21,22 +21,63 @@
     <input type="text" id="type" placeholder="type">
     <input type="text" id="url" placeholder="url">
     <input type="text" id="description" placeholder="description">
+    <div id="codes"></div>
     <div id="sh">shangchuan</div>
     <div id="test">test</div>
+    <input type="text" id="account">
+    <input type="text" id="password">
+    <input type="text" id="captcha">
+    <div id="login">123123123</div>
+    <input type="text" id="account">
+    <input type="text" id="password">
+    <input type="text" id="type">
+    <input type="text" id="status">
+    <input type="text" id="idCard">
     <script type="text/javascript" src="/assets/js/jquery.js"></script>
     <script>
-        $('#test').on('click', function () {
+        $.ajax({
+            url:"/source/searchFile",
+            type:"post",
+            data:{
+                type:1
+            },
+            success:function(s){
+                console.log(s)
+            }
+        })
+        $.ajax({
+            url: "/rest/captcha",
+            type: 'get',
+            async: false,
+            success: function (responseStr) {
+                $("#codes").html(responseStr)
+            }
+        });
+        $('#login').on('click', function () {
             $.ajax({
-                url: "/permission/setPermission",
+                url: "/rest/singIn",
                 type: 'POST',
                 async: false,
                 data: {
-                    permCode: $("#permCode").val(),
-                    name: $("#name").val(),
-                    status: $("#status").val(),
-                    type: $("#type").val(),
-                    url: $("#url").val(),
-                    description: $("#description").val(),
+                    account: $('#account').val(),
+                    password: $('#password').val(),
+                    captcha: $('#captcha').val()
+                },
+                success: function (responseStr) {
+                    console.log(responseStr)
+                }
+            });
+        })
+        $('#test').on('click', function () {
+            $.ajax({
+                url: "/rest/register",
+                type: 'POST',
+                async: false,
+                data: {
+                    name: 123,
+                    account: 123,
+                    password: 123,
+                    idCard: 1,
                 },
                 success: function (responseStr) {
                     alert(responseStr.info)

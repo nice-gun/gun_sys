@@ -1,4 +1,4 @@
-var pool = require('../../orm/mysql');
+var pool = require('../../orm/mysql').pool;
 module.exports = {
     // 增加用户
     addUser: function (parameter, callback) {
@@ -22,21 +22,6 @@ module.exports = {
                 callback(err, null, null);
             } else {
                 conn.query(`SELECT * FROM auth_user where account = ${pool.escape(parameter.account)}`, function (qerr, vals, fields) {
-                    //释放连接
-                    conn.release();
-                    //事件驱动回调
-                    callback(qerr, vals, fields);
-                });
-            }
-        });
-    },
-    // 登录
-    singIn: function (parameter, callback) {
-        pool.getConnection(function (err, conn) {
-            if (err) {
-                callback(err, null, null);
-            } else {
-                conn.query(``, function (qerr, vals, fields) {
                     //释放连接
                     conn.release();
                     //事件驱动回调

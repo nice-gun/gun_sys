@@ -1,34 +1,12 @@
 var pool = require('../../orm/mysql').pool;
 module.exports = {
     // 写入资源
-    writeRole: function (parameter, callback) {
+    selectAll: function (parameter, callback) {
         pool.getConnection(function (err, conn) {
             if (err) {
                 callback(err, null, null);
             } else {
-                conn.query(`insert into auth_role (${(function () {
-                    let field = '', i = 0;
-                    for (let ins in parameter) {
-                        i++
-                        if (i == Object.keys(parameter).length) {
-                            field += ` \`${ins}\` `
-                        } else {
-                            field += ` \`${ins}\` ,`
-                        }
-                    }
-                    return field
-                })()}) VALUES( ${(function () {
-                    let field = '', i = 0;
-                    for (let ins in parameter) {
-                        i++
-                        if (i == Object.keys(parameter).length) {
-                            field += ` ${pool.escape(parameter[ins])} `
-                        } else {
-                            field += ` ${pool.escape(parameter[ins])} ,`
-                        }
-                    }
-                    return field
-                })()})`, function (qerr, vals, fields) {
+                conn.query(`select * from ${parameter.name}`, function (qerr, vals, fields) {
                     //释放连接
                     conn.release();
                     //事件驱动回调
@@ -38,12 +16,12 @@ module.exports = {
         });
     },
     // 查询资源
-    searchRole: function (parameter, callback) {
+    searchPermission: function (parameter, callback) {
         pool.getConnection(function (err, conn) {
             if (err) {
                 callback(err, null, null);
             } else {
-                conn.query(`select * from auth_role order by \`index\` desc where ${(function () {
+                conn.query(`select * from auth_permission where ${(function () {
                     let field = '', i = 0;
                     for (let ins in parameter) {
                         i++
@@ -54,7 +32,7 @@ module.exports = {
                         }
                     }
                     return field
-                })()}`, function (qerr, vals, fields) {
+                })()} order by \`index\` asc`, function (qerr, vals, fields) {
                     //释放连接
                     conn.release();
                     //事件驱动回调
@@ -64,12 +42,12 @@ module.exports = {
         });
     },
     // 删除资源
-    deleteRole: function (parameter, callback) {
+    deletePermission: function (parameter, callback) {
         pool.getConnection(function (err, conn) {
             if (err) {
                 callback(err, null, null);
             } else {
-                conn.query(`delete from auth_role where id = ${pool.escape(parameter.id)} `, function (qerr, vals, fields) {
+                conn.query(`delete from auth_permission where id = ${pool.escape(parameter.id)} `, function (qerr, vals, fields) {
                     //释放连接
                     conn.release();
                     //事件驱动回调
@@ -79,12 +57,12 @@ module.exports = {
         });
     },
     // 编辑资源
-    editRole: function (parameter, callback) {
+    editPermission: function (parameter, callback) {
         pool.getConnection(function (err, conn) {
             if (err) {
                 callback(err, null, null);
             } else {
-                conn.query(`update auth_role set ${
+                conn.query(`update auth_permission set ${
                     (function () {
                         let field = '', i = 0;
                         for (let ins in parameter.data) {
